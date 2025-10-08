@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReviewRadar – Analysis Result</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="hero">
+        <h1 class="hero-title">ReviewRadar – See the Pulse of Opinions</h1>
+        <h2 class="hero-subtitle">Sentiment Analysis</h2>
+    </header>
+
+    <div class="container">
+        <p><strong>Text:</strong> {{ text }}</p>
+        <p><strong>Sentiment:</strong> {{ sentiment }}</p>
+
+        {% if detected_lang and detected_lang != 'en' %}
+        <p><strong>Detected Language:</strong> {{ detected_lang }}</p>
+        <p><strong>Translated Text:</strong> {{ translated_text }}</p>
+        {% endif %}
+
+        {% if aspect_sentiments and aspect_sentiments|length > 0 %}
+        <h2>Aspect-based Sentiments</h2>
+        <div class="chart-card">
+            <canvas id="aspectChart" class="chart-canvas"></canvas>
+        </div>
+        <script id="aspect-data" type="application/json">{{ aspect_sentiments|tojson|safe }}</script>
+
+        <table class="pretty-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Sentiment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aspect, label in aspect_sentiments.items() %}
+                <tr>
+                    <td>{{ aspect }}</td>
+                    <td>
+                        <span class="badge {{ 'badge-positive' if label == 'Positive' else ('badge-neutral' if label == 'Neutral' else 'badge-negative') }}">
+                          {{ label }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <a class="btn btn-primary" href="/">Back to Home</a>
+    </div>
+
+    <footer>
+        &copy; 2025 <strong>ReviewRadar</strong>. Developed by Anukrit Sharma | All Rights Reserved | Version 1.0
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    if (window.Chart && Chart.defaults) {
+        Chart.defaults.font.family = 'Segoe UI, Roboto, Arial, sans-serif';
+        Chart.defaults.font.size = 13;
+        Chart.defaults.color = '#0b3b52';
+    }
+
+    (function() {
+        var dataEl = document.getElementById('aspect-data');
+        var data = null;
+        if (dataEl && dataEl.textContent) {
+            try { data = JSON.parse(dataEl.textContent); } catch(e) { data = null; }
+        }
+        if (!data) return;
+
+        var labels = Object.keys(data);
+        var values = [];
+        var colors = [];
+        var borderColors = [];
+
+        const POS = 'rgba(96, 165, 250, 0.85)';   // light blue
+        const NEU = 'rgba(148, 163, 184, 0.85)';  // slate
+        const NEG = 'rgba(248, 113, 113, 0.85)';  // light red
+        const POS_B = 'rgba(59, 130, 246, 1)';    // blue border
+        const NEU_B = 'rgba(100, 116, 139, 1)';
+        const NEG_B = 'rgba(239, 68, 68, 1)';
+
+        labels.forEach(k => {
+            const v = data[k];
+            if (v === 'Positive') {
+                values.push(100); colors.push(POS); borderColors.push(POS_B);
+            } else if (v === 'Neutral') {
+                values.push(50); colors.push(NEU); borderColors.push(NEU_B);
+            } else {
+                values.push(25); colors.push(NEG); borderColors.push(NEG_B);
+            }
+        });
+
+        var ctx = document.getElementById('aspectChart');
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Aspect score (%)',
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: borderColors,
+                    borderWidth: 2,
+                    borderRadius: 12,
+                    barPercentage: 0.65,
+                    categoryPercentage: 0.75
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#1e293b',
+                            font: { size: 13, weight: '600' },
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        titleColor: '#f1f5f9',
+                        bodyColor: '#e2e8f0',
+                        cornerRadius: 10,
+                        padding: 14,
+                        displayColors: true,
+                        borderColor: 'rgba(96, 165, 250, 0.5)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: (ctx) => ` ${ctx.formattedValue}%`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#1e293b',
+                            font: { size: 13, weight: '600' }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(148,163,184,0.15)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#1e293b',
+                            font: { size: 12, weight: '500' },
+                            stepSize: 25
+                        }
+                    }
+                },
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutCubic'
+                }
+            }
+        });
+    })();
+    </script>
+</body>
+</html>

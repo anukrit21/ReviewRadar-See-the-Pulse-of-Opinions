@@ -1,0 +1,44 @@
+/* background and subtle UI overrides without touching the main stylesheet */
+:root {
+    /* keep palette consistent with existing styles.css */
+    --brand: #0ea5a4; /* teal */
+    --accent: #10b981; /* emerald */
+    --danger: #ef4444; /* red */
+    --neutral-900: #111827;
+    --neutral-700: #374151;
+    --neutral-500: #6b7280;
+    --neutral-100: #f3f4f6;
+    --white: #ffffff;
+  }
+  
+  /* Correct the background to use shorthand and ensure cover + fixed behavior */
+  body {
+    background: #f4f4f4 url("/static/img/technology.jpg") center / cover no-repeat fixed;
+  }
+  
+  /* Slightly refine header spacing/contrast without changing layout */
+  header {
+    padding-top: 8px;
+  }
+  header h1 {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+  
+  /* Ensure buttons have strong focus states for accessibility */
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(14, 165, 164, 0.25);
+  }
+  
+  /* Make secondary button hover more obvious */
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--brand);
+    color: var(--brand);
+  }
+  
+  /* Chart container: ensure spacing in small viewports */
+  .chart-card {
+    margin-top: 10px;
+  }
+  

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReviewRadar – See the Pulse of Opinions</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="hero">
+        <h1 class="hero-title">ReviewRadar – See the Pulse of Opinions</h1>
+        <h2 class="hero-subtitle">Sentiment Analysis</h2>
+    </header>
+
+    <div class="container">
+        <form id="sentiment-form" action="/predict" method="post">
+            <label for="text" class="label-3d">Enter your text:</label><br>
+            <textarea id="text" name="text" rows="4" cols="50" placeholder="Type your review here..."></textarea><br><br>
+            <input class="btn btn-primary" type="submit" value="Analyze">
+        </form>
+
+        {% if sentiment %}
+        <div class="result">
+            <h2>Sentiment Analysis Result</h2>
+            <p><strong>Text:</strong> {{ text }}</p>
+            <p><strong>Sentiment:</strong> {{ sentiment }}</p>
+            <a class="btn btn-secondary" href="/">Back to Home</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        &copy; 2025 <strong>ReviewRadar</strong>. Developed by Anukrit Sharma | All Rights Reserved | Version 1.0
+    </footer>
+</body>
+</html>
